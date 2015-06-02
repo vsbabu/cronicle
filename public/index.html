@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="css/materialize.min.css"
+	media="screen,projection" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+<title>Cronicle</title>
+</head>
+
+<body>
+
+<div class="container">
+<div id="cronlist" class="row"></div>
+<div class="row">
+<form name="cronform" id="cronform" class="col s12">
+	<div class="row">
+		<div class="input-field col s12">
+          <input  id="name" type="text" name="name" class="validate" required="required">
+          <label for="name">Name</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="input-field col s12">
+          <input  id="description" type="text" name="description" class="validate" required="required">
+          <label for="description">Description</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="input-field col s8">
+          <input  id="expression" type="text" name="expression" class="validate" required="required">
+          <label for="expression">Cron Expression</label>
+        </div>
+		<div class="input-field col s4">
+          <input  id="timezone" type="text" name="timezone">
+          <label for="timezone">Timezone</label>
+        </div>
+	</div>
+
+	<div class="row">
+		<div class="input-field col s6">
+          <input  id="gracePeriodForStart" type="number" name="gracePeriodForStart" class="validate" required="required" value="5">
+          <label for="gracePeriodForStart">Grace Period For Start (m)</label>
+        </div>
+		<div class="input-field col s6">
+          <input  id="maxRuntime" type="number" name="maxRuntime" class="validate" required="required" value="-1">
+          <label for="maxRuntime">Timeout(m)</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="col s6">
+		  <button class="btn col s12 waves-effect waves-light" type="submit" name="action">Save
+		  </button>
+        </div>
+		<div class="col s6">
+		  <button type="reset" class="btn col s12 red waves-effect waves-light" name="reset">Reset
+		  </button>
+        </div>
+	</div>
+
+</form>
+</div>
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">OK</a>
+    </div>
+</div>
+  
+<script type="text/template" id="tpl-runlist">
+<table class="bordered striped col s12">
+<thead>
+<tr>
+	<th>Scheduled</th>
+	<th>Start</th>
+	<th>End</th>
+	<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{{#each runs}}
+<tr>
+	<td>{{dateFormat scheduleTime}}</td>
+	<td>{{dateFormat startTime}}</td>
+	<td>{{dateFormat endTime}}</td>
+	<td>{{status}}</td>
+</tr>
+{{/each}}
+</tbody>
+</table>
+
+</script>
+
+<script type="text/template" id="tpl-cronlist">
+<table class="bordered striped col s12">
+<thead>
+<tr>
+	<th>Cron</th>
+	<th>Last Run Status</th>
+	<th>Next Run At</th>
+</tr>
+</thead>
+<tbody>
+{{#each crons}}
+<tr>
+	<td><strong>{{name}}</strong> - {{description}}<br/><small>{{key}}</small></td>
+	<td>{{lastRunStatus}} 
+	{{#if lastRunStatus}}
+<a href="#" onClick="showRunLog('{{key}}');return false;">[?]</a>
+	{{/if}}
+	</td>
+	<td>{{dateFormat nextRun}}<br/><small>{{expression}}<small></td>
+</tr>
+{{/each}}
+</tbody>
+</table>
+</script>
+
+
+<script type="text/template" id="tpl-cronform">
+</script>
+
+<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<script type="text/javascript" src="js/handlebars-v3.0.3.js"></script>
+
+<script type="text/javascript">
+moment.locale('en');
+//format an ISO date using Moment.js
+//http://momentjs.com/
+//moment syntax example: moment(Date("2011-07-18T15:50:52")).format("MMMM YYYY")
+//usage: {{dateFormat creation_date format="MMMM YYYY"}}
+Handlebars.registerHelper('dateFormat', function(context, block) {
+	if (window.moment) {
+		var f = block.hash.format || "ddd, MMM DD, YYYY hh:mm:ss A";
+		if (context == null) return "";
+		return moment(context).format(f); //had to remove Date(context)
+	} else {
+		return context; //  moment plugin not available. return data as is.
+	}
+	;
+});
+Handlebars.registerHelper('timeFromNow', function(context) {
+	if (window.moment) {
+		if (content == null) return "";
+		return moment(context).fromNow(); 
+	} else {
+		return context; //  moment plugin not available. return data as is.
+	}
+	;
+});
+
+function loadCronList() {
+	$.ajax({
+		url : "./crons/"
+	}).done(function(data) {
+		console.log(data);
+		var tpl = Handlebars.compile($("#tpl-cronlist").html());
+		var ctx = {
+			"crons" : []
+		};
+		if (data._embedded && data._embedded.cron) {
+			ctx.crons = data._embedded.cron;
+		}
+		;
+		$("#cronlist").html(tpl(ctx));
+	});
+}
+$(document).ready(function() {
+	loadCronList();
+});
+
+$("#cronform").submit(function(e){
+	e.preventDefault();
+	var dump = $("#cronform").serializeArray(),
+	    len = dump.length;
+	var dumpdata = {}; 
+	for (i=0; i<len; i++) {
+	  key = dump[i].name;
+      var v = dump[i].value;
+      dumpdata[key] = v;
+	}
+	dumpdata.gracePeriodForStart = parseInt(dumpdata.gracePeriodForStart);
+	dumpdata.maxRuntime = parseInt(dumpdata.maxRuntime);
+	$.ajax({
+		url: "./crons/",
+		type: "POST",
+		data: JSON.stringify(dumpdata),
+		contentType: "application/json",
+		dataType: "json"
+	}).done(function(){
+		loadCronList();
+	});
+});
+
+function showRunLog(job) {
+	$.ajax({
+		url : "./job/" + job
+	}).done(function(data) {
+		console.log(data);
+		var tpl = Handlebars.compile($("#tpl-runlist").html());
+		var ctx = {
+			"runs" : data
+		};
+		$(".modal-content").html(tpl(ctx));
+		$('#modal1').openModal();
+	});
+}
+</script>
+
+</body>
+</html>
