@@ -9,27 +9,24 @@
 <title>Cronicle</title>
 </head>
 
-<body>
+<body class="grey darken-3">
 
 <div class="container">
 <p>
 <a class="btn-floating btn-large waves-effect waves-light red right" id="add-cron"><i class="mdi-content-add large"></i></a>
 </p>
+<h2 class="left orange-text">Cronicle</h2>
 
 
 <div id="cronlist" class="row">
 <h2 class="red-text">
 No cron's configured yet 
 </h2>
-
 </div> 
 
 
 <div id="main-modal" class="modal">
     <div class="modal-content">
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">CLOSE</a>
     </div>
 </div>
   
@@ -49,40 +46,61 @@ No cron's configured yet
 	<td>{{dateFormat scheduleTime}}</td>
 	<td>{{dateFormat startTime}}</td>
 	<td>{{dateFormat endTime}}</td>
-	<td>{{status}}</td>
+	<td>{{wordify status}}</td>
 </tr>
 {{/each}}
 </tbody>
 </table>
-
+<a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat right">CLOSE</a>
 </script>
 
 <script type="text/template" id="tpl-cronlist">
-<table class="bordered striped col s12">
-<thead>
-<tr>
-	<th>Cron</th>
-	<th>Last Run Status</th>
-	<th>Next Run At</th>
-</tr>
-</thead>
-<tbody>
+<div class="row" style="clear:both;">
 {{#each crons}}
-<tr>
-	<td>
-<a href="#" onClick="showEditCron('{{key}}');return false;" class="waves-effect waves-teal btn-flat left">
-<i class="tiny mdi-editor-mode-edit"></i></a>
-         <strong>{{name}}</strong> - {{description}}<br/><small>{{key}}</small>
-    </td>
-	<td>
-<strong class="left">{{lastRunStatus}}</strong> 
-<a href="#" onClick="showRunLog('{{key}}');return false;" class="btn btn-floating right"><i class="tiny mdi-action-list"></i></a>
-	</td>
-	<td>{{dateFormat nextRun}}<br/><small>{{expression}}<small></td>
-</tr>
+  <div class="col s12 m6 l6">
+    <div class="card  light-green lighten-5">
+      <div class="card-content">
+          <span class="card-title activator grey-text text-darken-4">{{wordify name}} <i class="mdi-navigation-more-vert right"></i></span>
+          {{#xif lastRunStatus '==' 'SUCCESS'}}
+            <h4 class="green-text center-align">{{wordify lastRunStatus}}</h4>
+          {{/xif}}
+          {{#xif lastRunStatus '==' 'DID_NOT_RUN'}}
+            <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
+          {{/xif}}
+          {{#xif lastRunStatus '==' 'FAILED'}}
+            <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
+          {{/xif}}
+          {{#xif lastRunStatus '==' 'RAN_TOO_LONG'}}
+            <h4 class="brown-text center-align">{{wordify lastRunStatus}}</h4>
+          {{/xif}}
+          {{#xif lastRunStatus '==' 'RUNNING'}}
+            <h4 class="blue-text center-align">{{wordify lastRunStatus}}</h4>
+          {{/xif}}
+          {{#xif lastRunStatus '==' null}}
+            <h4 class="grey-text center-align">Yet to Run</h4>
+          {{/xif}}
+          <p class="right">
+            Next : <strong>{{dateFormat nextRun}}</strong>
+          </p>
+      </div>
+      <div class="card-reveal">
+        <span class="card-title grey-text text-darken-4">{{name}} <i class="mdi-navigation-close right"></i></span>
+        <h6>Key: {{key}}</h6>
+        <h6>Cron: {{expression}}</h6>
+        <p>{{description}}</p>
+      </div>
+      <div class="card-action">
+        <a href="#" onClick="showEditCron('{{key}}');return false;" class="waves-effect waves-teal orange lighten-2 btn-floating">
+        <i class="tiny mdi-editor-mode-edit"></i></a>
+        <a href="#" onClick="showDeleteCron('{{key}}');return false;" class="waves-effect waves-teal red  lighten-2 btn-floating">
+        <i class="tiny mdi-action-delete"></i></a>
+      <a href="#" onClick="showRunLog('{{key}}');return false;" class="waves-effect waves-teal btn-floating right">
+        <i class="tiny mdi-action-list"></i></a>
+      </div>
+    </div>
+  </div>
 {{/each}}
-</tbody>
-</table>
+</div>
 </script>
 
 <script type="text/template" id="tpl-cronform">
@@ -168,12 +186,42 @@ Handlebars.registerHelper('dateFormat', function(context, block) {
 });
 Handlebars.registerHelper('timeFromNow', function(context) {
 	if (window.moment) {
-		if (content == null) return "";
+		if (context == null) return "";
 		return moment(context).fromNow(); 
 	} else {
 		return context; //  moment plugin not available. return data as is.
 	}
 	;
+});
+Handlebars.registerHelper('xif', function (v1, operator, v2, options) {
+  switch (operator) {
+    case '==':
+      return (v1 == v2) ? options.fn(this) : options.inverse(this);
+    case '===':
+      return (v1 === v2) ? options.fn(this) : options.inverse(this);
+    case '<':
+      return (v1 < v2) ? options.fn(this) : options.inverse(this);
+    case '<=':
+      return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+    case '>':
+      return (v1 > v2) ? options.fn(this) : options.inverse(this);
+    case '>=':
+      return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+    case '&&':
+      return (v1 && v2) ? options.fn(this) : options.inverse(this);
+    case '||':
+      return (v1 || v2) ? options.fn(this) : options.inverse(this);
+    default:
+      return options.inverse(this);
+  }
+});
+
+Handlebars.registerHelper('wordify', function(context) {
+		if (context == null) return "";
+    var x = context.replace(/[_\-]/g, " ");
+    return x.toLowerCase().replace(/(?:^|\s)[a-z]/g, function (m) {
+      return m.toUpperCase();
+    });
 });
 
 function loadCronList() {
@@ -272,6 +320,9 @@ function showEditCron(guid) {
 			$("#name").focus();
 		  }
 		});
+}
+function showDeleteCron(guid) {
+  alert("Be patient; delete is on the way in next release!");
 }
 
 
