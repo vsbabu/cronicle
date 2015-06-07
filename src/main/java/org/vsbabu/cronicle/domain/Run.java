@@ -40,15 +40,11 @@ public class Run implements Serializable {
 		this.status = RunStatus.SCHEDULED;
 	}
 
-	public Run(Cron cronjob) {
+	public Run(Cron cronjob, RunStatus status) {
 		super();
 		this.cronId = cronjob.getId();
+		this.status = status;
 	}
-
-    public Run(String cronjobId) {
-        super();
-        this.cronId = cronjobId; //no validation as to ID exists
-    }
 
     public Long getId() {
 		return id;

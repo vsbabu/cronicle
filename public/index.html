@@ -108,10 +108,9 @@
 {{#each crons}}
 <tr>
 	<td><strong>{{name}}</strong> - {{description}}<br/><small>{{key}}</small></td>
-	<td>{{lastRunStatus}} 
-	{{#if lastRunStatus}}
-<a href="#" onClick="showRunLog('{{key}}');return false;">[?]</a>
-	{{/if}}
+	<td>
+<strong class="left">{{lastRunStatus}}</strong> 
+<a href="#" onClick="showRunLog('{{key}}');return false;" class="btn btn-floating right"><i class="tiny mdi-action-list"></i></a>
 	</td>
 	<td>{{dateFormat nextRun}}<br/><small>{{expression}}<small></td>
 </tr>

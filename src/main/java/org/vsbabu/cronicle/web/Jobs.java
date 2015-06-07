@@ -1,7 +1,6 @@
 package org.vsbabu.cronicle.web;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.vsbabu.cronicle.domain.Cron;
 import org.vsbabu.cronicle.domain.Run;
-import org.vsbabu.cronicle.domain.RunStatus;
-import org.vsbabu.cronicle.service.CronRepository;
+import org.vsbabu.cronicle.service.CronManagerService;
 import org.vsbabu.cronicle.service.RunRepository;
 
 /**
@@ -33,13 +31,13 @@ import org.vsbabu.cronicle.service.RunRepository;
 @RequestMapping(value = "/job")
 public class Jobs {
 
-	@Autowired private CronRepository cronRepository;
 	@Autowired private RunRepository runRepository;
+	@Autowired private CronManagerService cronManager;
 
 	// TODO: add a today's list of runs; or between last 12 and next 12 hours
 	@RequestMapping(value = "/{job}", method = RequestMethod.GET)
 	public List<Run> jobRuns(@PathVariable("job") String jobid) {
-		Cron job = cronRepository.findById(jobid);
+		Cron job = cronManager.getCron(jobid);
 		if (job == null)
 			return null;
 		return runRepository.findByCronIdOrderByScheduleTimeDesc(jobid);
@@ -47,79 +45,28 @@ public class Jobs {
 
 	@RequestMapping(value = "/{job}/start", method = RequestMethod.GET)
 	public String jobStart(@PathVariable("job") String jobid) {
-		Cron job = cronRepository.findById(jobid);
+		Cron job = cronManager.getCron(jobid);
 		if (job == null)
 			return "Not found";
-		List<Run> runs = runRepository
-				.findByCronIdAndStatusOrderByScheduleTimeDesc(jobid,
-						RunStatus.SCHEDULED);
-		Run run = null;
-		for (Run it : runs) {
-			run = it;
-			break;
-		}
-		if (run == null)
-			run = new Run(job);
-		run.setStatus(RunStatus.RUNNING);
-		run.setStartTime(new Date());
-		runRepository.save(run);
-		job.setLastRunStatus(RunStatus.RUNNING);
-		cronRepository.save(job);
+		cronManager.startRun(job);
 		return "Started";
 	}
 
 	@RequestMapping(value = "/{job}/pass", method = RequestMethod.GET)
 	public String jobSuccess(@PathVariable("job") String jobid) {
-		Cron job = cronRepository.findById(jobid);
+		Cron job = cronManager.getCron(jobid);
 		if (job == null)
 			return "Not found";
-		List<Run> runs = runRepository
-				.findByCronIdOrderByScheduleTimeDesc(jobid);
-		Run run = null;
-		for (Run it : runs) {
-			if (it.getStatus() == RunStatus.SCHEDULED
-					|| it.getStatus() == RunStatus.RUNNING) {
-				run = it;
-				break;
-			}
-		}
-		if (run == null)
-			run = new Run(job);
-		if (run.getStartTime() == null)
-			run.setStartTime(new Date());
-		run.setStatus(RunStatus.SUCCESS);
-		run.setEndTime(new Date());
-		runRepository.save(run);
-		job.setLastRunStatus(RunStatus.SUCCESS);
-		cronRepository.save(job);
-
+		cronManager.passRun(job);
 		return "Success";
 	}
 
 	@RequestMapping(value = "/{job}/fail", method = RequestMethod.GET)
 	public String jobFailed(@PathVariable("job") String jobid) {
-		Cron job = cronRepository.findById(jobid);
+		Cron job = cronManager.getCron(jobid);
 		if (job == null)
 			return "Not found";
-		List<Run> runs = runRepository
-				.findByCronIdOrderByScheduleTimeDesc(jobid);
-		Run run = null;
-		for (Run it : runs) {
-			if (it.getStatus() == RunStatus.SCHEDULED
-					|| it.getStatus() == RunStatus.RUNNING) {
-				run = it;
-				break;
-			}
-		}
-		if (run == null)
-			run = new Run(job);
-		if (run.getStartTime() == null)
-			run.setStartTime(new Date());
-		run.setStatus(RunStatus.FAILED);
-		run.setEndTime(new Date());
-		runRepository.save(run);
-		job.setLastRunStatus(RunStatus.FAILED);
-		cronRepository.save(job);
+		cronManager.failRun(job);
 		return "Failed";
 	}
 
