@@ -45,7 +45,7 @@ public class Cron implements Serializable {
 		this.name = name;
 		this.description = description;
         this.expression = cronExpression; //TODO: add validation
-        this.timezone = timezone;
+        setTimezone(timezone);
         this.gracePeriodForStart = gracePeriodForStart;
         this.maxRuntime = maxRunTime;
 	}
@@ -131,7 +131,10 @@ public class Cron implements Serializable {
 	}
 
 	public void setTimezone(String timezone) {
-		this.timezone = timezone;
+		if (timezone!=null && timezone.trim().isEmpty())
+			this.timezone = null;
+		else
+			this.timezone = timezone;
 	}
 
 	public RunStatus getLastRunStatus() {
@@ -142,19 +145,6 @@ public class Cron implements Serializable {
 		this.lastRunStatus = lastRunStatus;
 	}
 
-
-    /**
-     * Note that this does not check if any are existing. It may very simply
-     * cause unique index violation and throw an exception
-     * @return
-     */
-    /*
-	private String makeShortHash() {
-		String hs = RandomStringUtils.random(8, 0, 0, true, true, null, new SecureRandom());
-		this.hashCode = hs.toLowerCase();
-		return this.hashCode;
-	}
-	*/
 }
 
 	

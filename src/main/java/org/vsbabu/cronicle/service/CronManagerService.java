@@ -31,7 +31,7 @@ public class CronManagerService {
 	}
 	
 	public Cron getCron(String cronid) {
-		return cronRepository.findById(cronid);
+		return cronRepository.findOne(cronid);
 	}
 	
 	

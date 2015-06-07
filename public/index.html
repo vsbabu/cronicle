@@ -12,62 +12,24 @@
 <body>
 
 <div class="container">
-<div id="cronlist" class="row"></div>
-<div class="row">
-<form name="cronform" id="cronform" class="col s12">
-	<div class="row">
-		<div class="input-field col s12">
-          <input  id="name" type="text" name="name" class="validate" required="required">
-          <label for="name">Name</label>
-        </div>
-	</div>
-	<div class="row">
-		<div class="input-field col s12">
-          <input  id="description" type="text" name="description" class="validate" required="required">
-          <label for="description">Description</label>
-        </div>
-	</div>
-	<div class="row">
-		<div class="input-field col s8">
-          <input  id="expression" type="text" name="expression" class="validate" required="required">
-          <label for="expression">Cron Expression</label>
-        </div>
-		<div class="input-field col s4">
-          <input  id="timezone" type="text" name="timezone">
-          <label for="timezone">Timezone</label>
-        </div>
-	</div>
+<p>
+<a class="btn-floating btn-large waves-effect waves-light red right" id="add-cron"><i class="mdi-content-add large"></i></a>
+</p>
 
-	<div class="row">
-		<div class="input-field col s6">
-          <input  id="gracePeriodForStart" type="number" name="gracePeriodForStart" class="validate" required="required" value="5">
-          <label for="gracePeriodForStart">Grace Period For Start (m)</label>
-        </div>
-		<div class="input-field col s6">
-          <input  id="maxRuntime" type="number" name="maxRuntime" class="validate" required="required" value="-1">
-          <label for="maxRuntime">Timeout(m)</label>
-        </div>
-	</div>
-	<div class="row">
-		<div class="col s6">
-		  <button class="btn col s12 waves-effect waves-light" type="submit" name="action">Save
-		  </button>
-        </div>
-		<div class="col s6">
-		  <button type="reset" class="btn col s12 red waves-effect waves-light" name="reset">Reset
-		  </button>
-        </div>
-	</div>
 
-</form>
-</div>
-</div>
+<div id="cronlist" class="row">
+<h2 class="red-text">
+No cron's configured yet 
+</h2>
 
-<div id="modal1" class="modal">
+</div> 
+
+
+<div id="main-modal" class="modal">
     <div class="modal-content">
     </div>
     <div class="modal-footer">
-      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">OK</a>
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">CLOSE</a>
     </div>
 </div>
   
@@ -107,7 +69,11 @@
 <tbody>
 {{#each crons}}
 <tr>
-	<td><strong>{{name}}</strong> - {{description}}<br/><small>{{key}}</small></td>
+	<td>
+<a href="#" onClick="showEditCron('{{key}}');return false;" class="waves-effect waves-teal btn-flat left">
+<i class="tiny mdi-editor-mode-edit"></i></a>
+         <strong>{{name}}</strong> - {{description}}<br/><small>{{key}}</small>
+    </td>
 	<td>
 <strong class="left">{{lastRunStatus}}</strong> 
 <a href="#" onClick="showRunLog('{{key}}');return false;" class="btn btn-floating right"><i class="tiny mdi-action-list"></i></a>
@@ -119,9 +85,65 @@
 </table>
 </script>
 
-
 <script type="text/template" id="tpl-cronform">
+<div class="row">
+<form name="cronform" id="cronform" class="col s12">
+	<div class="row">
+		<div class="input-field col s12">
+          <input  id="name" type="text" name="name" class="validate" required="required"
+            placeholder="this is a quick name/code identifier; better to keep it without spaces"
+			value="{{name}}">
+          <label for="name" class="active">Name</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="input-field col s12">
+          <input  id="description" type="text" name="description" class="validate" required="required"
+            value="{{description}}">
+          <label for="description" class="active">Description</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="input-field col s8">
+          <input  id="expression" type="text" name="expression" class="validate" required="required"
+          placeholder="quartz compliant; if using regular unix, prepend with a 0"
+          value="{{expression}}">
+          <label for="expression" class="active">Cron Expression</label>
+        </div>
+		<div class="input-field col s4">
+          <input  id="timezone" type="text" name="timezone" value="{{timezone}}">
+          <label for="timezone" class="active">Timezone</label>
+        </div>
+	</div>
+
+	<div class="row">
+		<div class="input-field col s6">
+          <input  id="gracePeriodForStart" type="number" name="gracePeriodForStart" class="validate" required="required" value="{{gracePeriodForStart}}">
+          <label for="gracePeriodForStart" class="active">Grace Period For Start (m)</label>
+        </div>
+		<div class="input-field col s6">
+          <input  id="maxRuntime" type="number" name="maxRuntime" class="validate" required="required" value="{{maxRuntime}}">
+          <label for="maxRuntime" class="active">Timeout(m)</label>
+        </div>
+	</div>
+	<div class="row">
+		<div class="col s6">
+		  <button class="btn col s12 waves-effect waves-light" type="submit" name="action">Save
+		  </button>
+        </div>
+		<div class="col s6">
+		  <button type="reset" class="btn col s12 red waves-effect waves-light" name="reset">Reset
+		  </button>
+        </div>
+	</div>
+{{#if key}}
+<input type="hidden" name="key" value="{{key}}"/>
+{{/if}}
+</form>
+</div>
+</div>
 </script>
+
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment-with-locales.min.js"></script>
@@ -173,7 +195,7 @@ $(document).ready(function() {
 	loadCronList();
 });
 
-$("#cronform").submit(function(e){
+$(document).on("submit", "#cronform", function(e){
 	e.preventDefault();
 	var dump = $("#cronform").serializeArray(),
 	    len = dump.length;
@@ -185,15 +207,35 @@ $("#cronform").submit(function(e){
 	}
 	dumpdata.gracePeriodForStart = parseInt(dumpdata.gracePeriodForStart);
 	dumpdata.maxRuntime = parseInt(dumpdata.maxRuntime);
-	$.ajax({
-		url: "./crons/",
-		type: "POST",
-		data: JSON.stringify(dumpdata),
-		contentType: "application/json",
-		dataType: "json"
-	}).done(function(){
-		loadCronList();
-	});
+	console.log(dumpdata);
+	if ('key' in dumpdata) {
+		//edit
+		$.ajax({
+			url: "./crons/"+dumpdata.key,
+			type: "PATCH",
+			data: JSON.stringify(dumpdata),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(){
+				closeMainModal();
+				loadCronList();
+				//TODO: handle failure
+			}
+		});
+	} else {
+		$.ajax({
+			url: "./crons/",
+			type: "POST",
+			data: JSON.stringify(dumpdata),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(){
+				closeMainModal();
+				loadCronList();
+				//TODO: handle failure
+			}
+		});
+	}
 });
 
 function showRunLog(job) {
@@ -206,9 +248,44 @@ function showRunLog(job) {
 			"runs" : data
 		};
 		$(".modal-content").html(tpl(ctx));
-		$('#modal1').openModal();
+		openMainModal();
 	});
 }
+
+function showAddCron() {
+	var tpl = Handlebars.compile($("#tpl-cronform").html());
+	var ctx = {"gracePeriodForStart":5, "maxRuntime":-1};
+	$(".modal-content").html(tpl(ctx));
+	openMainModal();
+	$("#name").focus();
+}
+
+function showEditCron(guid) {
+	var tpl = Handlebars.compile($("#tpl-cronform").html());
+	$.ajax({
+		url: "./crons/" + guid,
+		method: "GET",
+		contentType: "application/json",
+		success: function(ctx) {
+			$(".modal-content").html(tpl(ctx));
+			openMainModal();
+			$("#name").focus();
+		  }
+		});
+}
+
+
+function openMainModal(){
+	$('#main-modal').openModal();
+}
+
+function closeMainModal(){
+	$('#main-modal').closeModal();
+}
+
+
+$('#add-cron').click(showAddCron);
+
 </script>
 
 </body>
