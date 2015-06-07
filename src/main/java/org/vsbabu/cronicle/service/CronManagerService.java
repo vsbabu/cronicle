@@ -1,21 +1,30 @@
 package org.vsbabu.cronicle.service;
 
-import java.util.Calendar;
+import java.util.Calendar; 
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vsbabu.cronicle.domain.Cron;
 import org.vsbabu.cronicle.domain.Run;
 import org.vsbabu.cronicle.domain.RunStatus;
 
+import reactor.bus.EventBus;
+import reactor.bus.Event;
+
 @Service("CronManager")
 public class CronManagerService {
 
 	@Autowired private RunRepository runRepository;
 	@Autowired private CronRepository cronRepository;
-
+	
+	@Autowired EventBus eventBus;
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(CronManagerService.class);
 	
 	public List<Cron> getAllCrons() {
 		return cronRepository.findAll();
@@ -125,7 +134,9 @@ public class CronManagerService {
 		runRepository.save(run);
 		cron.setLastRunStatus(status);
 		cronRepository.save(cron);
-		// TODO: raise event
+		String eventName="RUN." + status.toString();
+		logger.debug("Raising Event : " + eventName);
+		eventBus.notify(eventName, Event.wrap(run));
 	}
 
 }

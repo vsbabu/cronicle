@@ -33,19 +33,23 @@ jar {
 dependencies {
     compile "joda-time:joda-time:2.2"
     compile("org.springframework.boot:spring-boot-starter-web") 
+    
     // uncomment following lines if you want to use embedded jetty
     // rather than tomcat
-    // // tag::jetty[]
     // compile("org.springframework.boot:spring-boot-starter-web") {
     //     exclude module: "spring-boot-starter-tomcat"
     // }
     // compile("org.springframework.boot:spring-boot-starter-jetty")
-    // // end::jetty[]
-    // tag::actuator[]
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    // end::actuator[]
-    compile("org.springframework.boot:spring-boot-starter-data-rest")
+    
+    //actuator provides bunch of health services; enable it if you need it
+    // compile("org.springframework.boot:spring-boot-starter-actuator")
+    
+	compile("org.springframework.boot:spring-boot-starter-data-rest")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    
+    compile("io.projectreactor:reactor-bus:2.0.2.RELEASE")
+    
+    //DB connector dependency
     compile("mysql:mysql-connector-java")
     //compile("com.h2database:h2")
     compile("com.fasterxml.jackson.core:jackson-databind")

@@ -10,6 +10,16 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 * Take config/application.properties and public into the folder above. Copy .sh too.
 * Adjust application.properties to set db stuff
 
+## Usage
+
+* Add a cron job using the UI
+* Note  the guid of the job
+* Change your cron job to run inside `cronicle_client_wrapper.sh`. See that script for usage.
+  * This means, if your crons are in another machine, you need to copy over the wrapper script there
+    and ensure that machine can do http connections to where this is running.
+* If you want, you can enable event processing by setting your handler in `application.properties`.
+  * Sample is given in `sample_event_handler.sh`
+
 ## Todo
 
 * Fix dist to package all that is needed
