@@ -16,27 +16,34 @@
       padding-top: 0px;
       padding-bottom: 0px;
     }
+    #logo-container {
+      font-weight: 600;
+      font-size: 100%;
+      font-style: italic;
+    }
   </style>
 </head>
 
 <body class="grey darken-3">
 
-<nav class="teal darken-3" role="navigation">
+<div class="navbar-fixed">
+<nav class="teal " role="navigation">
   <div class="nav-wrapper container">
     <a id="logo-container" href="#" class="left brand-logo">cronicle</a>
     <ul class="right" id="user-toolbar" >
       <li>
-        <a class=" waves-effect waves-light red-text " id="add-cron"><i class="mdi-content-add"></i></a>
+        <a class=" waves-effect waves-light  " id="add-cron"><i class="mdi-content-add"></i></a>
       </li>
       <li>
-        <a class="waves-effect waves-light blue-text " id="reload"><i class="mdi-action-autorenew"></i></a>
+        <a class="waves-effect waves-light  " id="reload"><i class="mdi-action-autorenew"></i></a>
       </li>
     </ul>
   </div>
 </nav>
+</div>
+
 <div class="section no-pad-bot" id="index-banner">
   <div class="container">
-
 
   <div id="cronlist" class="row">
     <h2 class="red-text"> No cron's configured yet </h2>
@@ -244,6 +251,7 @@ Handlebars.registerHelper('wordify', function(context) {
 });
 
 function loadCronList() {
+	$("#cronlist").html('<h3 class="center-align yellow-text">loading...</h3>');
 	$.ajax({
 		url : "./crons/"
 	}).done(function(data) {
