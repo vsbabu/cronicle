@@ -83,10 +83,10 @@
 <script type="text/template" id="tpl-cronlist">
 <div class="row" style="clear:both;">
 {{#each crons}}
-  <div class="col s12 m12 l6">
-    <div class="card  light-green lighten-5">
-      <div class="card-content">
-          <span class="card-title activator grey-text text-darken-4">{{wordify name}} <i class="mdi-navigation-more-vert right"></i></span>
+  <div class="col s12 m6 l4">
+    <div class="card light-green lighten-5">
+      <div class="card-content" style="height:220px;">
+          <span class="card-title activator grey-text text-darken-4" style="font-size:14pt;">{{wordify name}} <i class="mdi-navigation-more-vert right"></i></span>
           {{#xif lastRunStatus '==' 'SUCCESS'}}
             <h4 class="green-text center-align">{{wordify lastRunStatus}}</h4>
           {{/xif}}
