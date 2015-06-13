@@ -36,7 +36,7 @@ public class Cron implements Serializable {
     @Column(nullable=true) private int maxRuntime = -1;
 
 
-    @Column(nullable=true) private RunStatus lastRunStatus;
+    @Column(nullable=true) private Long lastRunId;
 
 	public Cron() {
     }
@@ -137,13 +137,14 @@ public class Cron implements Serializable {
 			this.timezone = timezone;
 	}
 
-	public RunStatus getLastRunStatus() {
-		return lastRunStatus;
+	public Long getLastRunId() {
+		return lastRunId;
 	}
 
-	public void setLastRunStatus(RunStatus lastRunStatus) {
-		this.lastRunStatus = lastRunStatus;
+	public void setLastRunId(Long lastRunId) {
+		this.lastRunId = lastRunId;
 	}
+
 
 }
 

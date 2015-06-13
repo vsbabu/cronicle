@@ -96,7 +96,7 @@
           {{#xif lastRunStatus '==' 'FAILED'}}
             <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
           {{/xif}}
-          {{#xif lastRunStatus '==' 'RAN_TOO_LONG'}}
+          {{#xif lastRunFlag '==' 'RAN_TOO_LONG'}}
             <h4 class="brown-text center-align">{{wordify lastRunStatus}}</h4>
           {{/xif}}
           {{#xif lastRunStatus '==' 'RUNNING'}}
@@ -253,16 +253,12 @@ Handlebars.registerHelper('wordify', function(context) {
 function loadCronList() {
 	$("#cronlist").html('<h3 class="center-align yellow-text">loading...</h3>');
 	$.ajax({
-		url : "./crons/"
+		url : "./crons/list"
 	}).done(function(data) {
 		var tpl = Handlebars.compile($("#tpl-cronlist").html());
 		var ctx = {
-			"crons" : []
+			"crons" : data
 		};
-		if (data._embedded && data._embedded.cron) {
-			ctx.crons = data._embedded.cron;
-		}
-		;
 		$("#cronlist").html(tpl(ctx));
 	});
 }
@@ -317,7 +313,6 @@ function showRunLog(job) {
 	$.ajax({
 		url : "./job/" + job
 	}).done(function(data) {
-		console.log(data);
 		var tpl = Handlebars.compile($("#tpl-runlist").html());
 		var ctx = {
 			"runs" : data

@@ -30,5 +30,7 @@ public interface RunRepository extends Repository<Run, Long> {
 
 	@Query(value="SELECT * FROM cronicle_run WHERE cron_id = ?1 AND status = 2 order by start_time desc", nativeQuery=true)
 	List<Run> getCurrentRun(String cronid);
+	
+	Run  findById(Long id);
 
 }

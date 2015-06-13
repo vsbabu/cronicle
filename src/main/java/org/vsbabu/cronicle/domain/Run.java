@@ -31,9 +31,13 @@ public class Run implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date endTime;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length=1)
 	@Enumerated(EnumType.ORDINAL)
 	private RunStatus status;
+	
+	@Column(nullable = true, length=1)
+	@Enumerated(EnumType.ORDINAL)
+	private RunFlag flag;
 	
 	public Run() {
         this.scheduleTime = new Date();
@@ -93,6 +97,14 @@ public class Run implements Serializable {
 
 	public void setCronId(String cronId) {
 		this.cronId = cronId;
+	}
+
+	public RunFlag getFlag() {
+		return flag;
+	}
+
+	public void setFlag(RunFlag flag) {
+		this.flag = flag;
 	}
 
 }

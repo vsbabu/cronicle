@@ -1,5 +1,6 @@
 package org.vsbabu.cronicle.service;
 
+import java.util.ArrayList;
 import java.util.Calendar; 
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vsbabu.cronicle.domain.Cron;
+import org.vsbabu.cronicle.domain.CronWithLastRun;
 import org.vsbabu.cronicle.domain.Run;
+import org.vsbabu.cronicle.domain.RunFlag;
 import org.vsbabu.cronicle.domain.RunStatus;
 
 import reactor.bus.EventBus;
@@ -25,6 +28,9 @@ public class CronManagerService {
 	
 	
 	private static final Logger logger = LoggerFactory.getLogger(CronManagerService.class);
+	//if it is already marked as ran too long, at some point
+	//we should mark it as failed.
+	private static final int MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED = 5;
 	
 	public List<Cron> getAllCrons() {
 		return cronRepository.findAll();
@@ -72,8 +78,16 @@ public class CronManagerService {
 				cal.setTime(r.getStartTime());
 				cal.add(Calendar.MINUTE, cron.getMaxRuntime());
 				if(current.after(cal.getTime())) {
-					r.setEndTime(current);
-					moveRunStatusTo(cron, r, RunStatus.RAN_TOO_LONG);
+					if (!RunFlag.RAN_TOO_LONG.equals(r.getFlag())) {
+						r.setEndTime(current);
+						setRunFlag(cron, r, RunFlag.RAN_TOO_LONG);
+					} else {
+						cal.add(Calendar.MINUTE, cron.getMaxRuntime()*(MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED-1));
+						if (current.after(cal.getTime())) {
+							r.setEndTime(current);
+							moveRunStatusTo(cron, r, RunStatus.FAILED);
+						}
+					}
 				}
 			}
 			if (RunStatus.SCHEDULED.equals(r.getStatus())) {
@@ -132,11 +146,50 @@ public class CronManagerService {
 		if (status.isWip())
 			run.setStartTime(new Date());
 		runRepository.save(run);
-		cron.setLastRunStatus(status);
+		cron.setLastRunId(run.getId());
 		cronRepository.save(cron);
 		String eventName="RUN." + status.toString();
 		logger.debug("Raising Event : " + eventName);
 		eventBus.notify(eventName, Event.wrap(run));
+	}
+	
+	private void setRunFlag(Cron cron, Run run, RunFlag flag) {
+		if (run == null || cron == null || flag == null)
+			return;
+		run.setFlag(flag);
+		String eventName="RUN." + flag.toString();
+		logger.debug("Raising Event : " + eventName);
+		eventBus.notify(eventName, Event.wrap(run));
+	}
+
+	public List<CronWithLastRun> findAllWithLastRun() {
+		List<CronWithLastRun> cwlrs = new ArrayList<CronWithLastRun>();
+		
+		for (Cron c : cronRepository.findAll()) {
+			CronWithLastRun cwlr = new CronWithLastRun();
+			//ought to use reflection or JPA2.1 native query to bean mapping
+			//this is ugly
+			cwlr.setDescription(c.getDescription());
+			cwlr.setId(c.getId());
+			cwlr.setName(c.getName());
+			cwlr.setExpression(c.getExpression());
+			cwlr.setGracePeriodForStart(c.getGracePeriodForStart());
+			cwlr.setMaxRuntime(c.getMaxRuntime());
+			cwlr.setLastRunId(c.getLastRunId());
+			if (c.getLastRunId() != null) {
+				Run r = runRepository.findById(c.getLastRunId());
+				if (r != null) {
+					cwlr.setLastRunFlag(r.getFlag());
+					cwlr.setLastRunStatus(r.getStatus());
+					cwlr.setScheduleTime(r.getScheduleTime());
+					cwlr.setEndTime(r.getEndTime());
+					cwlr.setStartTime(r.getStartTime());
+				}
+			}
+			cwlrs.add(cwlr);
+		}
+		
+		return cwlrs;
 	}
 
 }

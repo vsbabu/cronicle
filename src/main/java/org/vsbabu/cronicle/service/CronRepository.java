@@ -11,12 +11,8 @@ import org.vsbabu.cronicle.domain.Cron;
 public interface CronRepository extends Repository<Cron, String> {
 
 	Cron findOne(String id);
-	
+	List<Cron> findAll();
 	Cron save(Cron t);
 
-	List<Cron> findAll();
-
-	//FIXME: DELETE doesn't work; possibly because of one to many
-
-
+	//FIXME: DELETE isn't exposed
 }
