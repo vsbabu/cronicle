@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css" media="screen,projection"/>	
+  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css" media="screen,projection"/>  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <!-- TODO: icons -->
   <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
@@ -60,19 +60,19 @@
 <table class="bordered striped col s12">
 <thead>
 <tr>
-	<th>Scheduled</th>
-	<th>Start</th>
-	<th>End</th>
-	<th>Status</th>
+  <th>Scheduled</th>
+  <th>Start</th>
+  <th>End</th>
+  <th>Status</th>
 </tr>
 </thead>
 <tbody>
 {{#each runs}}
 <tr>
-	<td>{{dateFormat scheduleTime}}</td>
-	<td>{{dateFormat startTime}}</td>
-	<td>{{dateFormat endTime}}</td>
-	<td>{{wordify status}}</td>
+  <td>{{dateFormat scheduleTime format="DD/MM HH:mm:ss"}}</td>
+  <td>{{dateFormat startTime format="DD/MM HH:mm:ss"}}</td>
+  <td>{{dateFormat endTime format="DD/MM HH:mm:ss"}}</td>
+  <td>{{wordify status}}</td>
 </tr>
 {{/each}}
 </tbody>
@@ -87,26 +87,32 @@
     <div class="card light-green lighten-5">
       <div class="card-content" style="height:220px;">
           <span class="card-title activator grey-text text-darken-4" style="font-size:14pt;">{{wordify name}} <i class="mdi-navigation-more-vert right"></i></span>
-          {{#xif lastRunStatus '==' 'SUCCESS'}}
-            <h4 class="green-text center-align">{{wordify lastRunStatus}}</h4>
-          {{/xif}}
-          {{#xif lastRunStatus '==' 'DID_NOT_RUN'}}
-            <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
-          {{/xif}}
-          {{#xif lastRunStatus '==' 'FAILED'}}
-            <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
-          {{/xif}}
-          {{#xif lastRunFlag '==' 'RAN_TOO_LONG'}}
-            <h4 class="brown-text center-align">{{wordify lastRunStatus}}</h4>
-          {{/xif}}
-          {{#xif lastRunStatus '==' 'RUNNING'}}
-            <h4 class="blue-text center-align">{{wordify lastRunStatus}}</h4>
-          {{/xif}}
-          {{#xif lastRunStatus '==' null}}
+          <div style="height:110px;">
+          {{#if ranToday}}
+            {{#xif lastRunStatus '==' 'SUCCESS'}}
+              <h4 class="green-text center-align">{{wordify lastRunStatus}}</h4>
+            {{/xif}}
+            {{#xif lastRunStatus '==' 'DID_NOT_RUN'}}
+              <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
+            {{/xif}}
+            {{#xif lastRunStatus '==' 'FAILED'}}
+              <h4 class="red-text center-align">{{wordify lastRunStatus}}</h4>
+            {{/xif}}
+            {{#xif lastRunStatus '==' 'RUNNING'}}
+              <h4 class="blue-text center-align">{{wordify lastRunStatus}}</h4>
+            {{/xif}}
+            <p class="center-align">
+              <em>{{timeFromNow endTime}}</em>
+              {{#xif lastRunFlag '==' 'RAN_TOO_LONG'}}
+                <br/><span class="red-text"><strong>{{wordify lastRunFlag}}</strong></span>
+              {{/xif}}
+            </p>
+          {{else}}
             <h4 class="grey-text center-align">Yet to Run</h4>
-          {{/xif}}
+          {{/if}}
+          </div>
           <p class="right">
-            Next : <strong>{{dateFormat nextRun}}</strong>
+            Next : <strong>{{timeFromNow nextRun}}</strong>
           </p>
       </div>
       <div class="card-reveal">
@@ -132,54 +138,54 @@
 <script type="text/template" id="tpl-cronform">
 <div class="row">
 <form name="cronform" id="cronform" class="col s12">
-	<div class="row">
-		<div class="input-field col s12">
+  <div class="row">
+    <div class="input-field col s12">
           <input  id="name" type="text" name="name" class="validate" required="required"
             placeholder="this is a quick name/code identifier; better to keep it without spaces"
-			value="{{name}}">
+      value="{{name}}">
           <label for="name" class="active">Name</label>
         </div>
-	</div>
-	<div class="row">
-		<div class="input-field col s12">
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
           <input  id="description" type="text" name="description" class="validate" required="required"
             value="{{description}}">
           <label for="description" class="active">Description</label>
         </div>
-	</div>
-	<div class="row">
-		<div class="input-field col s8">
+  </div>
+  <div class="row">
+    <div class="input-field col s8">
           <input  id="expression" type="text" name="expression" class="validate" required="required"
           placeholder="quartz compliant; if using regular unix, prepend with a 0"
           value="{{expression}}">
           <label for="expression" class="active">Cron Expression</label>
         </div>
-		<div class="input-field col s4">
+    <div class="input-field col s4">
           <input  id="timezone" type="text" name="timezone" value="{{timezone}}">
           <label for="timezone" class="active">Timezone</label>
         </div>
-	</div>
+  </div>
 
-	<div class="row">
-		<div class="input-field col s6">
+  <div class="row">
+    <div class="input-field col s6">
           <input  id="gracePeriodForStart" type="number" name="gracePeriodForStart" class="validate" required="required" value="{{gracePeriodForStart}}">
           <label for="gracePeriodForStart" class="active">Grace Period For Start (m)</label>
         </div>
-		<div class="input-field col s6">
+    <div class="input-field col s6">
           <input  id="maxRuntime" type="number" name="maxRuntime" class="validate" required="required" value="{{maxRuntime}}">
           <label for="maxRuntime" class="active">Timeout(m)</label>
         </div>
-	</div>
-	<div class="row">
-		<div class="col s6">
-		  <button class="btn col s12 waves-effect waves-light" type="submit" name="action">Save
-		  </button>
+  </div>
+  <div class="row">
+    <div class="col s6">
+      <button class="btn col s12 waves-effect waves-light" type="submit" name="action">Save
+      </button>
         </div>
-		<div class="col s6">
-		  <button type="reset" class="btn col s12 red waves-effect waves-light" name="reset">Reset
-		  </button>
+    <div class="col s6">
+      <button type="reset" class="btn col s12 red waves-effect waves-light" name="reset">Reset
+      </button>
         </div>
-	</div>
+  </div>
 {{#if key}}
 <input type="hidden" name="key" value="{{key}}"/>
 {{/if}}
@@ -201,28 +207,30 @@ moment.locale('en');
 //moment syntax example: moment(Date("2011-07-18T15:50:52")).format("MMMM YYYY")
 //usage: {{dateFormat creation_date format="MMMM YYYY"}}
 Handlebars.registerHelper('dateFormat', function(context, block) {
-	if (window.moment) {
-		var f = block.hash.format || "ddd, MMM DD, YYYY hh:mm:ss A";
-		if (context == null) return "";
-		return moment(context).format(f); //had to remove Date(context)
-	} else {
-		return context; //  moment plugin not available. return data as is.
-	}
-	;
+  if (window.moment) {
+    var f = block.hash.format || "ddd, MMM DD, YYYY hh:mm:ss A";
+    if (context == null) return "";
+    return moment(context).format(f); //had to remove Date(context)
+  } else {
+    return context; //  moment plugin not available. return data as is.
+  }
+  ;
 });
 Handlebars.registerHelper('timeFromNow', function(context) {
-	if (window.moment) {
-		if (context == null) return "";
-		return moment(context).fromNow(); 
-	} else {
-		return context; //  moment plugin not available. return data as is.
-	}
-	;
+  if (window.moment) {
+    if (context == null) return "";
+    return moment(context).calendar(); 
+  } else {
+    return context; //  moment plugin not available. return data as is.
+  }
+  ;
 });
 Handlebars.registerHelper('xif', function (v1, operator, v2, options) {
   switch (operator) {
     case '==':
       return (v1 == v2) ? options.fn(this) : options.inverse(this);
+    case '!=':
+      return (v1 != v2) ? options.fn(this) : options.inverse(this);
     case '===':
       return (v1 === v2) ? options.fn(this) : options.inverse(this);
     case '<':
@@ -243,7 +251,7 @@ Handlebars.registerHelper('xif', function (v1, operator, v2, options) {
 });
 
 Handlebars.registerHelper('wordify', function(context) {
-		if (context == null) return "";
+    if (context == null) return "";
     var x = context.replace(/[_\-]/g, " ");
     return x.toLowerCase().replace(/(?:^|\s)[a-z]/g, function (m) {
       return m.toUpperCase();
@@ -251,97 +259,105 @@ Handlebars.registerHelper('wordify', function(context) {
 });
 
 function loadCronList() {
-	$("#cronlist").html('<h3 class="center-align yellow-text">loading...</h3>');
-	$.ajax({
-		url : "./crons/list"
-	}).done(function(data) {
-		var tpl = Handlebars.compile($("#tpl-cronlist").html());
-		var ctx = {
-			"crons" : data
-		};
-		$("#cronlist").html(tpl(ctx));
-	});
+  $("#cronlist").html('<h3 class="center-align yellow-text">loading...</h3>');
+  $.ajax({
+    url : "./crons/list"
+  }).done(function(data) {
+    var tpl = Handlebars.compile($("#tpl-cronlist").html());
+    var ctx = {
+      "crons" : data
+    };
+    var today = moment().startOf('day');
+    for (var i=0; i < ctx.crons.length; i++) {
+      var c = ctx.crons[i];
+      c.ranToday = false;
+      if (c.lastRunStatus != null && c.startTime > today) {
+        c.ranToday = true;
+      }
+    }
+    $("#cronlist").html(tpl(ctx));
+  });
 }
 $(document).ready(function() {
-	loadCronList();
+  loadCronList();
 });
 
 $(document).on("submit", "#cronform", function(e){
-	e.preventDefault();
-	var dump = $("#cronform").serializeArray(),
-	    len = dump.length;
-	var dumpdata = {}; 
-	for (i=0; i<len; i++) {
-	  key = dump[i].name;
+  e.preventDefault();
+  var dump = $("#cronform").serializeArray(),
+      len = dump.length;
+  var dumpdata = {}; 
+  for (i=0; i<len; i++) {
+    key = dump[i].name;
       var v = dump[i].value;
       dumpdata[key] = v;
-	}
-	dumpdata.gracePeriodForStart = parseInt(dumpdata.gracePeriodForStart);
-	dumpdata.maxRuntime = parseInt(dumpdata.maxRuntime);
-	console.log(dumpdata);
-	if ('key' in dumpdata) {
-		//edit
-		$.ajax({
-			url: "./crons/"+dumpdata.key,
-			type: "PATCH",
-			data: JSON.stringify(dumpdata),
-			contentType: "application/json",
-			dataType: "json",
-			success: function(){
-				closeMainModal();
-				loadCronList();
-				//TODO: handle failure
-			}
-		});
-	} else {
-		$.ajax({
-			url: "./crons/",
-			type: "POST",
-			data: JSON.stringify(dumpdata),
-			contentType: "application/json",
-			dataType: "json",
-			success: function(){
-				closeMainModal();
-				loadCronList();
-				//TODO: handle failure
-			}
-		});
-	}
+  }
+  dumpdata.gracePeriodForStart = parseInt(dumpdata.gracePeriodForStart);
+  dumpdata.maxRuntime = parseInt(dumpdata.maxRuntime);
+  console.log(dumpdata);
+  if ('key' in dumpdata) {
+    //edit
+    $.ajax({
+      url: "./crons/"+dumpdata.key,
+      type: "PATCH",
+      data: JSON.stringify(dumpdata),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(){
+        closeMainModal();
+        loadCronList();
+        //TODO: handle failure
+      }
+    });
+  } else {
+    $.ajax({
+      url: "./crons/",
+      type: "POST",
+      data: JSON.stringify(dumpdata),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(){
+        closeMainModal();
+        loadCronList();
+        //TODO: handle failure
+      }
+    });
+  }
 });
 
 function showRunLog(job) {
-	$.ajax({
-		url : "./job/" + job
-	}).done(function(data) {
-		var tpl = Handlebars.compile($("#tpl-runlist").html());
-		var ctx = {
-			"runs" : data
-		};
-		$(".modal-content").html(tpl(ctx));
-		openMainModal();
-	});
+  $.ajax({
+    url : "./job/" + job
+  }).done(function(data) {
+    var tpl = Handlebars.compile($("#tpl-runlist").html());
+    var ctx = {
+      "runs" : data
+    };
+    $(".modal-content").html(tpl(ctx));
+    openMainModal();
+  });
 }
 
 function showAddCron() {
-	var tpl = Handlebars.compile($("#tpl-cronform").html());
-	var ctx = {"gracePeriodForStart":5, "maxRuntime":-1};
-	$(".modal-content").html(tpl(ctx));
-	openMainModal();
-	$("#name").focus();
+  var tpl = Handlebars.compile($("#tpl-cronform").html());
+  var ctx = {"gracePeriodForStart":5, "maxRuntime":-1};
+  $(".modal-content").html(tpl(ctx));
+  openMainModal();
+  $("#name").focus();
 }
 
 function showEditCron(guid) {
-	var tpl = Handlebars.compile($("#tpl-cronform").html());
-	$.ajax({
-		url: "./crons/" + guid,
-		method: "GET",
-		contentType: "application/json",
-		success: function(ctx) {
-			$(".modal-content").html(tpl(ctx));
-			openMainModal();
-			$("#name").focus();
-		  }
-		});
+  var tpl = Handlebars.compile($("#tpl-cronform").html());
+  $.ajax({
+    url: "./crons/" + guid,
+    method: "GET",
+    contentType: "application/json",
+    success: function(ctx) {
+      $(".modal-content").html(tpl(ctx));
+      openMainModal();
+      $("#name").focus();
+      }
+    });
 }
 function showDeleteCron(guid) {
   alert("Be patient; delete is on the way in next release!");
@@ -349,11 +365,11 @@ function showDeleteCron(guid) {
 
 
 function openMainModal(){
-	$('#main-modal').openModal();
+  $('#main-modal').openModal();
 }
 
 function closeMainModal(){
-	$('#main-modal').closeModal();
+  $('#main-modal').closeModal();
 }
 
 
