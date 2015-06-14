@@ -31,8 +31,10 @@ import org.vsbabu.cronicle.service.RunRepository;
 @RequestMapping(value = "/job")
 public class Jobs {
 
-	@Autowired private RunRepository runRepository;
-	@Autowired private CronManagerService cronManager;
+	@Autowired
+	private RunRepository runRepository;
+	@Autowired
+	private CronManagerService cronManager;
 
 	// TODO: add a today's list of runs; or between last 12 and next 12 hours
 	@RequestMapping(value = "/{job}", method = RequestMethod.GET)

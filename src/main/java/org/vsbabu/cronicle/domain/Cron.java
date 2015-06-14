@@ -5,155 +5,160 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
-
 @Entity
-@Table(name="cronicle_cron")
+@Table(name = "cronicle_cron")
 public class Cron implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(generator = "uuid")
-  @GenericGenerator(name = "uuid", strategy = "uuid2")
-  private String id;
+	@Id
+	@GeneratedValue(generator = "uuid")
+	@GenericGenerator(name = "uuid", strategy = "uuid2")
+	private String id;
 
+	@Column(nullable = false)
+	private String name;
+	@Column(nullable = false)
+	private String description;
+	@Column(nullable = false)
+	private String expression;
+	@Column(nullable = true)
+	private String timezone;
+	@Column(nullable = false)
+	private int gracePeriodForStart = 0;
+	@Column(nullable = true)
+	private int maxRuntime = -1;
 
-  @Column(nullable=false) private String name;
-  @Column(nullable=false) private String description;
-  @Column(nullable=false) private String expression;
-  @Column(nullable=true)  private String timezone;
-  @Column(nullable=false) private int gracePeriodForStart = 0;
-  @Column(nullable=true) private int maxRuntime = -1;
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "last_run_id")
+	private Run lastRun;
 
+	public Cron() {
+	}
 
-  @Column(nullable=true) private Long lastRunId;
+	public Cron(String name, String description, String cronExpression,
+			String timezone, int gracePeriodForStart, int maxRunTime) {
+		this.name = name;
+		this.description = description;
+		this.expression = cronExpression; // TODO: add validation
+		setTimezone(timezone);
+		this.gracePeriodForStart = gracePeriodForStart;
+		this.maxRuntime = maxRunTime;
+	}
 
-  public Cron() {
-  }
+	public String getName() {
+		return name;
+	}
 
-  public Cron(String name, String description, String cronExpression, String timezone, int gracePeriodForStart, int maxRunTime) {
-    this.name = name;
-    this.description = description;
-    this.expression = cronExpression; //TODO: add validation
-    setTimezone(timezone);
-    this.gracePeriodForStart = gracePeriodForStart;
-    this.maxRuntime = maxRunTime;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
+	public String getDescription() {
+		return description;
+	}
 
-  public String getName() {
-    return name;
-  }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-  public void setName(String name) {
-    this.name = name;
-  }
+	public String getExpression() {
+		return expression;
+	}
 
-  public String getDescription() {
-    return description;
-  }
+	public void setExpression(String expression) {
+		this.expression = expression;
+	}
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+	@Transient
+	public String getKey() {
+		return this.id;
+	}
 
+	@SuppressWarnings("static-access")
+	@Transient
+	public Date getNextRun() {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(this.getNextRunWithoutGrace());
+		cal.add(Calendar.MINUTE, this.gracePeriodForStart);
+		return cal.getTime();
+	}
 
+	@SuppressWarnings("static-access")
+	@Transient
+	public Date getNextRunWithoutGrace() {
+		CronSequenceGenerator csg;
+		if (this.getTimezone() == null) {
+			csg = new CronSequenceGenerator(this.expression);
+		} else {
+			TimeZone tz = TimeZone.getDefault();
+			try {
+				csg = new CronSequenceGenerator(this.expression,
+						tz.getTimeZone(this.timezone));
+			} catch (Exception ex) {
+				csg = new CronSequenceGenerator(this.expression);
+			}
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(csg.next(new Date()));
+		return cal.getTime();
+	}
 
-  public String getExpression() {
-    return expression;
-  }
+	public String getId() {
+		return id;
+	}
 
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-  @Transient
-  public String getKey() {
-    return this.id;
-  }
+	public int getMaxRuntime() {
+		return maxRuntime;
+	}
 
-  @SuppressWarnings("static-access")
-  @Transient
-  public Date getNextRun() {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(this.getNextRunWithoutGrace());
-    cal.add(Calendar.MINUTE, this.gracePeriodForStart);
-    return cal.getTime();
-  }
+	public void setMaxRuntime(int maxRuntime) {
+		this.maxRuntime = maxRuntime;
+	}
 
-  @SuppressWarnings("static-access")
-  @Transient
-  public Date getNextRunWithoutGrace() {
-    CronSequenceGenerator csg;
-    if (this.getTimezone() == null) {
-      csg = new CronSequenceGenerator(this.expression);
-    } else {
-      TimeZone tz = TimeZone.getDefault();
-      try {
-        csg = new CronSequenceGenerator(this.expression, tz.getTimeZone(this.timezone));
-      } catch (Exception ex) {
-        csg = new CronSequenceGenerator(this.expression);
-      }
-    }
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(csg.next(new Date()));
-    return cal.getTime();
-  }
+	public int getGracePeriodForStart() {
+		return gracePeriodForStart;
+	}
 
-  public String getId() {
-    return id;
-  }
+	public void setGracePeriodForStart(int gracePeriodForStart) {
+		this.gracePeriodForStart = gracePeriodForStart;
+	}
 
-  public void setId(String id) {
-    this.id = id;
-  }
+	public String getTimezone() {
+		return timezone;
+	}
 
-  public int getMaxRuntime() {
-    return maxRuntime;
-  }
+	public void setTimezone(String timezone) {
+		if (timezone != null && timezone.trim().isEmpty())
+			this.timezone = null;
+		else
+			this.timezone = timezone;
+	}
 
-  public void setMaxRuntime(int maxRuntime) {
-    this.maxRuntime = maxRuntime;
-  }
+	public Run getLastRun() {
+		return lastRun;
+	}
 
-  public int getGracePeriodForStart() {
-    return gracePeriodForStart;
-  }
-
-  public void setGracePeriodForStart(int gracePeriodForStart) {
-    this.gracePeriodForStart = gracePeriodForStart;
-  }
-
-  public String getTimezone() {
-    return timezone;
-  }
-
-  public void setTimezone(String timezone) {
-    if (timezone!=null && timezone.trim().isEmpty())
-      this.timezone = null;
-    else
-      this.timezone = timezone;
-  }
-
-  public Long getLastRunId() {
-    return lastRunId;
-  }
-
-  public void setLastRunId(Long lastRunId) {
-    this.lastRunId = lastRunId;
-  }
-
+	public void setLastRun(Run lastRun) {
+		this.lastRun = lastRun;
+	}
 
 }
-
-	

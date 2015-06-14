@@ -1,7 +1,6 @@
 package org.vsbabu.cronicle.service;
 
-import java.util.ArrayList;
-import java.util.Calendar; 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -10,46 +9,48 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.vsbabu.cronicle.domain.Cron;
-import org.vsbabu.cronicle.domain.CronWithLastRun;
 import org.vsbabu.cronicle.domain.Run;
 import org.vsbabu.cronicle.domain.RunFlag;
 import org.vsbabu.cronicle.domain.RunStatus;
 
-import reactor.bus.EventBus;
 import reactor.bus.Event;
+import reactor.bus.EventBus;
 
 @Service("CronManager")
 public class CronManagerService {
 
-	@Autowired private RunRepository runRepository;
-	@Autowired private CronRepository cronRepository;
-	
-	@Autowired EventBus eventBus;
-	
-	
-	private static final Logger logger = LoggerFactory.getLogger(CronManagerService.class);
-	//if it is already marked as ran too long, at some point
-	//we should mark it as failed.
+	@Autowired
+	private RunRepository runRepository;
+	@Autowired
+	private CronRepository cronRepository;
+
+	@Autowired
+	EventBus eventBus;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CronManagerService.class);
+	// if it is already marked as ran too long, at some point
+	// we should mark it as failed.
 	private static final int MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED = 5;
-	
+
 	public List<Cron> getAllCrons() {
 		return cronRepository.findAll();
 	}
-	
+
 	public Cron getCron(String cronid) {
 		return cronRepository.findOne(cronid);
 	}
-	
-	
+
 	public Run getCurrentRun(Cron cron) {
 		List<Run> runs = runRepository.getCurrentRun(cron.getId());
-		if (runs == null || runs.isEmpty()) return null;
+		if (runs == null || runs.isEmpty())
+			return null;
 		return runs.get(0);
 	}
-	
+
 	public Run getNextScheduleRun(Cron cron) {
-		List<Run> runs = 
-				runRepository.findByCronIdAndStatusOrderByScheduleTimeDesc(cron.getId(), 
+		List<Run> runs = runRepository
+				.findByCronIdAndStatusOrderByScheduleTimeDesc(cron.getId(),
 						RunStatus.SCHEDULED);
 		Run run = null;
 		for (Run it : runs) {
@@ -59,9 +60,8 @@ public class CronManagerService {
 		return run;
 	}
 
-	
 	public Run scheduleNextRun(Cron cron) {
-		//safe way - delete all future scheduled runs and schedule a new one
+		// safe way - delete all future scheduled runs and schedule a new one
 		runRepository.deleteFutureScheduled(cron.getId());
 		Run r = new Run(cron, RunStatus.SCHEDULED);
 		r.setScheduleTime(cron.getNextRun());
@@ -72,17 +72,18 @@ public class CronManagerService {
 	public void fixPastPendingRuns(Cron cron) {
 		List<Run> runs = runRepository.findByPastPendingRuns(cron.getId());
 		Date current = new Date();
-		for (Run r: runs) {
-			if (r.getStatus().isWip() && cron.getMaxRuntime()>=0) {
+		for (Run r : runs) {
+			if (r.getStatus().isWip() && cron.getMaxRuntime() >= 0) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(r.getStartTime());
 				cal.add(Calendar.MINUTE, cron.getMaxRuntime());
-				if(current.after(cal.getTime())) {
+				if (current.after(cal.getTime())) {
 					if (!RunFlag.RAN_TOO_LONG.equals(r.getFlag())) {
 						r.setEndTime(current);
 						setRunFlag(cron, r, RunFlag.RAN_TOO_LONG);
 					} else {
-						cal.add(Calendar.MINUTE, cron.getMaxRuntime()*(MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED-1));
+						cal.add(Calendar.MINUTE, cron.getMaxRuntime()
+								* (MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED - 1));
 						if (current.after(cal.getTime())) {
 							r.setEndTime(current);
 							moveRunStatusTo(cron, r, RunStatus.FAILED);
@@ -95,12 +96,14 @@ public class CronManagerService {
 			}
 		}
 	}
-		
+
 	public void startRun(Cron cron) {
 		Run run = getCurrentRun(cron);
-		if (run != null) return;  //no parallel runs tracked
-		
-		run = getNextScheduleRun(cron); //always pick a scheduled run even if it is far out in future
+		if (run != null)
+			return; // no parallel runs tracked
+
+		run = getNextScheduleRun(cron); // always pick a scheduled run even if
+										// it is far out in future
 		if (run == null) {
 			run = makeRunWithoutSchedule(cron, RunStatus.UNSCHEDULED);
 		}
@@ -110,7 +113,8 @@ public class CronManagerService {
 
 	public void passRun(Cron cron) {
 		Run run = getCurrentRun(cron);
-		if (run == null) run = getNextScheduleRun(cron);
+		if (run == null)
+			run = getNextScheduleRun(cron);
 		if (run == null) {
 			run = makeRunWithoutSchedule(cron, RunStatus.UNSCHEDULED);
 		}
@@ -119,10 +123,10 @@ public class CronManagerService {
 		scheduleNextRun(cron);
 	}
 
-
 	public void failRun(Cron cron) {
 		Run run = getCurrentRun(cron);
-		if (run == null) getNextScheduleRun(cron);
+		if (run == null)
+			getNextScheduleRun(cron);
 		if (run == null) {
 			run = makeRunWithoutSchedule(cron, RunStatus.UNSCHEDULED);
 		}
@@ -131,13 +135,11 @@ public class CronManagerService {
 		scheduleNextRun(cron);
 	}
 
-
 	private Run makeRunWithoutSchedule(Cron cron, RunStatus status) {
 		Run r = new Run(cron, status);
 		runRepository.save(r);
 		return r;
 	}
-
 
 	private void moveRunStatusTo(Cron cron, Run run, RunStatus status) {
 		if (run == null || cron == null || status == null)
@@ -146,51 +148,26 @@ public class CronManagerService {
 		if (status.isWip())
 			run.setStartTime(new Date());
 		runRepository.save(run);
-		cron.setLastRunId(run.getId());
+		cron.setLastRun(run);
 		cronRepository.save(cron);
-		String eventName="RUN." + status.toString();
+		String eventName = "RUN." + status.toString();
 		logger.debug("Raising Event : " + eventName);
 		eventBus.notify(eventName, Event.wrap(run));
 	}
-	
+
 	private void setRunFlag(Cron cron, Run run, RunFlag flag) {
 		if (run == null || cron == null || flag == null)
 			return;
 		run.setFlag(flag);
-		String eventName="RUN." + flag.toString();
+		String eventName = "RUN." + flag.toString();
 		logger.debug("Raising Event : " + eventName);
 		eventBus.notify(eventName, Event.wrap(run));
 	}
 
-	public List<CronWithLastRun> findAllWithLastRun() {
-		List<CronWithLastRun> cwlrs = new ArrayList<CronWithLastRun>();
-		
-		for (Cron c : cronRepository.findAll()) {
-			CronWithLastRun cwlr = new CronWithLastRun();
-			//ought to use reflection or JPA2.1 native query to bean mapping
-			//this is ugly
-			cwlr.setDescription(c.getDescription());
-			cwlr.setId(c.getId());
-			cwlr.setName(c.getName());
-			cwlr.setExpression(c.getExpression());
-			cwlr.setGracePeriodForStart(c.getGracePeriodForStart());
-			cwlr.setMaxRuntime(c.getMaxRuntime());
-			cwlr.setLastRunId(c.getLastRunId());
-			cwlr.setNextRun(c.getNextRunWithoutGrace());
-			if (c.getLastRunId() != null) {
-				Run r = runRepository.findById(c.getLastRunId());
-				if (r != null) {
-					cwlr.setLastRunFlag(r.getFlag());
-					cwlr.setLastRunStatus(r.getStatus());
-					cwlr.setScheduleTime(r.getScheduleTime());
-					cwlr.setEndTime(r.getEndTime());
-					cwlr.setStartTime(r.getStartTime());
-				}
-			}
-			cwlrs.add(cwlr);
-		}
-		
-		return cwlrs;
+	public List<Cron> findAllWithLastRunNew() {
+		List<Cron> crons = cronRepository.findAll();
+		for (Cron c : crons)
+			c.getLastRun();
+		return crons;
 	}
-
 }
