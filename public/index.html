@@ -43,7 +43,7 @@
 </div>
 
 <div class="section no-pad-bot" id="index-banner">
-  <div class="container">
+  <div class="container-faked">
 
   <div id="cronlist" class="row">
     <h2 class="red-text"> No cron's configured yet </h2>
@@ -83,7 +83,7 @@
 <script type="text/template" id="tpl-cronlist">
 <div class="row" style="clear:both;">
 {{#each crons}}
-  <div class="col s12 m6 l4">
+  <div class="col s12 m6 l3">
     <div class="card light-green lighten-5">
       <div class="card-content" style="height:220px;">
           <span class="card-title activator grey-text text-darken-4" style="font-size:14pt;">{{wordify name}} <i class="mdi-navigation-more-vert right"></i></span>
@@ -275,6 +275,10 @@ function loadCronList() {
         c.ranToday = true;
       }
     }
+    ctx.crons = ctx.crons.sort(function(a,b){
+      //sort by time of day when it is supposed to run for easy display
+      return (moment(a.nextRun).format("HHmmss") > moment(b.nextRun).format("HHmmss"))?1:-1;
+    });
     $("#cronlist").html(tpl(ctx));
   });
 }

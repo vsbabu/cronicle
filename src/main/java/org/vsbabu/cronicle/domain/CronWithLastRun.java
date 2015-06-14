@@ -36,10 +36,17 @@ public class CronWithLastRun extends Cron {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
+	public Date getNextRun() {
+		return nextRun;
+	}
+	public void setNextRun(Date nextRun) {
+		this.nextRun = nextRun;
+	}
 	private RunStatus lastRunStatus;
 	private RunFlag lastRunFlag;
 	private Date scheduleTime;
 	private Date startTime;
 	private Date endTime;
+	private Date nextRun;
 	
 }

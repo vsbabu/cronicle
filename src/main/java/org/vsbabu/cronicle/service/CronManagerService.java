@@ -176,6 +176,7 @@ public class CronManagerService {
 			cwlr.setGracePeriodForStart(c.getGracePeriodForStart());
 			cwlr.setMaxRuntime(c.getMaxRuntime());
 			cwlr.setLastRunId(c.getLastRunId());
+			cwlr.setNextRun(c.getNextRunWithoutGrace());
 			if (c.getLastRunId() != null) {
 				Run r = runRepository.findById(c.getLastRunId());
 				if (r != null) {
