@@ -5,10 +5,11 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 
 ## Installation
 
-* Build like gradle build
-* Make a folder where this needs to run from
-* Take config/application.properties and public into the folder above. Copy .sh too.
-* Adjust application.properties to set db stuff
+* Build like `gradle build`
+* Distribution is in `build/distributions`
+  * Note that those tar/zip can be exploded and rsync'ed to your installation host to save bandwidth on changes
+* Take `sample/application.properties in the distribution to root of your installation and edit it
+* Run `bin/cronicle`
 
 ## Usage
 

@@ -29,6 +29,15 @@ jar {
 }
 // end::jar[]
 
+
+applicationDistribution.from("public/") {
+    into "public"
+}
+applicationDistribution.from("config/application.properties") {
+    into "sample"
+}
+applicationDistribution.from("README.md")
+
 // tag::dependencies[]
 dependencies {
     compile "joda-time:joda-time:2.2"
@@ -63,3 +72,4 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }
 // end::wrapper[]
+
