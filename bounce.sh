@@ -14,7 +14,7 @@ mv nohup.out  nohup.`date +%Y-%m-%d_%H%M%S`.out
 rm -f nohup.out 
 if [ $# -eq 0 ]; then
 	# if any argument is given, just kill the server
-	nohup java -jar cronicle-0.1.0.jar > nohup.out 2>&1 &
+	nohup bin/cronicle > nohup.out 2>&1 &
 	echo $! > $PIDFILE
 else
 	exit

@@ -37,6 +37,7 @@ applicationDistribution.from("config/application.properties") {
     into "sample"
 }
 applicationDistribution.from("README.md")
+applicationDistribution.from("bounce.sh")
 
 // tag::dependencies[]
 dependencies {
