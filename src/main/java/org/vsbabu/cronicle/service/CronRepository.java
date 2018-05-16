@@ -10,7 +10,8 @@ import org.vsbabu.cronicle.domain.Cron;
 @RepositoryRestResource(collectionResourceRel = "cron", path = "crons")
 public interface CronRepository extends Repository<Cron, String> {
 
-	Cron findOne(String id);
+	//Cron findOne(String id);
+	Cron findById(String id);
 
 	List<Cron> findAll();
 

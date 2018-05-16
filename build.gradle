@@ -1,28 +1,28 @@
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE")
-    }
+	ext {
+		springBootVersion = '2.0.1.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'idea'
-
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
-apply plugin: 'spring-boot'
+apply plugin: 'idea'
+//apply plugin: 'spring-boot'
 
+//group = 'org.vsbabu'
+//version = '0.1.0'
+sourceCompatibility = 1.8
 mainClassName = 'org.vsbabu.cronicle.Application'
 
-// tag::repositories[]
-repositories {
-    mavenCentral()
-}
-// end::repositories[]
-
-// tag::jar[]
 jar {
     baseName = 'cronicle'
     version = '0.1.0'
@@ -39,38 +39,21 @@ applicationDistribution.from("config/application.properties") {
 applicationDistribution.from("README.md")
 applicationDistribution.from("bounce.sh")
 
-// tag::dependencies[]
+repositories {
+	mavenCentral()
+}
+
+
 dependencies {
-    compile "joda-time:joda-time:2.2"
-    compile("org.springframework.boot:spring-boot-starter-web") 
-    
-    // uncomment following lines if you want to use embedded jetty
-    // rather than tomcat
-    // compile("org.springframework.boot:spring-boot-starter-web") {
-    //     exclude module: "spring-boot-starter-tomcat"
-    // }
-    // compile("org.springframework.boot:spring-boot-starter-jetty")
-    
-    //actuator provides bunch of health services; enable it if you need it
-    // compile("org.springframework.boot:spring-boot-starter-actuator")
-    
+	compile("joda-time:joda-time:2.2")
+	compile('org.springframework.boot:spring-boot-starter')
+  compile("org.springframework.boot:spring-boot-starter-web") 
 	compile("org.springframework.boot:spring-boot-starter-data-rest")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
-    
-    compile("io.projectreactor:reactor-bus:2.0.2.RELEASE")
-    
-    //DB connector dependency
-    compile("mysql:mysql-connector-java")
-    //compile("com.h2database:h2")
-    compile("com.fasterxml.jackson.core:jackson-databind")
-    compile("org.apache.commons:commons-lang3:3.4")
-
+	compile("org.springframework.boot:spring-boot-starter-data-jpa")
+	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile("org.apache.commons:commons-lang3:3.4")
+	compile("io.projectreactor:reactor-bus:2.0.8.RELEASE")
+	compile("io.projectreactor:reactor-core:2.0.8.RELEASE")
+	runtime('com.h2database:h2')
+	//runtime("org.springframework.boot:spring-boot-starter-jdbc")
 }
-// end::dependencies[]
-
-// tag::wrapper[]
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
-}
-// end::wrapper[]
-

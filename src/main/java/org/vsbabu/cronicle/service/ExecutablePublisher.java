@@ -13,6 +13,7 @@ import org.vsbabu.cronicle.domain.Run;
 import reactor.bus.Event;
 import reactor.fn.Consumer;
 
+
 /**
  * Simple publisher that calls a specified executable in background with event
  * info
