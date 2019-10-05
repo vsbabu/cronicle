@@ -7,8 +7,9 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 
 * Build like `gradle buildDistZip`
 * Distribution is in `build/distributions`
-  * Note that those tar/zip can be exploded and rsync'ed to your installation host to save bandwidth on changes
-* Take `sample/application.properties in the distribution to root of your installation and edit it
+* Take `sample/application.properties` in the distribution to root of your installation and edit it. Default DB is h2; if you want 
+  to change to mysql or postgres, change `build.gradle` to add dependencies and
+  to edit property file with correct connect strings and credentials.
 * Run `bin/cronicle`
 
 ## Usage
