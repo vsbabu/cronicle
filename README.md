@@ -25,6 +25,8 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 ## Todo
 
 * move schedule future to an api and call it on cron status changed event or created
+* relying on guid isn't quite secure unless you've access limited to intranet.
+  At least add basic auth.
 * job cleaner only does timeout and not run marking
 * Fix long running logic
 * UI fixes; add/edit/delete; auto refresh; backbone.js
