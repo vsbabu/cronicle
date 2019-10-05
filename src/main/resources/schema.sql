@@ -5,6 +5,7 @@ CREATE TABLE cronicle_cron (
   description varchar(255) NOT NULL,
   grace_period_for_start int(11) NOT NULL,
   last_run_status int(1) DEFAULT NULL,
+  last_run_id bigint(20) DEFAULT NULL,
   max_runtime int(11) DEFAULT NULL,
   timezone varchar(255) DEFAULT NULL,
   PRIMARY KEY (id)

@@ -1,4 +1,8 @@
 *.class
+*.db
+/.idea/
+todo.txt
+application.properties
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

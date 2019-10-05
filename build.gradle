@@ -30,14 +30,28 @@ jar {
 // end::jar[]
 
 
-applicationDistribution.from("public/") {
-    into "public"
+bootDistZip {
+    into("${project.name}-boot/sample") {
+      from './config/application.properties' 
+      from './sample-event-handler.sh' 
+      from './cronicle-client-wrapper.sh' 
+    }
+    into("${project.name}-boot/") { 
+      from './README.md' 
+      from './bounce.sh' 
+    }
 }
-applicationDistribution.from("config/application.properties") {
-    into "sample"
+bootDistTar {
+    into("${project.name}-boot/sample") { 
+      from './config/application.properties' 
+      from './sample-event-handler.sh' 
+      from './cronicle-client-wrapper.sh' 
+    }
+    into("${project.name}-boot/") { 
+      from './README.md' 
+      from './bounce.sh' 
+    }
 }
-applicationDistribution.from("README.md")
-applicationDistribution.from("bounce.sh")
 
 repositories {
 	mavenCentral()
