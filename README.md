@@ -45,6 +45,7 @@ file to be called on this event.
 * Run `bin/cronicle`
 
 ## Quick Demo
+* Install `jq`  and `curl` utilities
 * Unzip the distribution somewhere
 * Setup `application.properties` and run `bin/cronicle`
 * Go to http://localhost:8080/ - once you get the UI
