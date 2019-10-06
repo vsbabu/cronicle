@@ -4,6 +4,9 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 services that do this, but I found it too expensive for doing such a thing.
 Also, wanted to get muscle memory refreshed on typing in Java code :)
 
+At just about 1000 sloc (<700 for Java; rest for HTML), it is meeting my needs pretty well. Feel free to 
+fork and use/change it.
+
 ## Design
 
 ![Design](cronicle.png)
