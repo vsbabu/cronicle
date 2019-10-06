@@ -8,13 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.vsbabu.cronicle.domain.Cron;
 import org.vsbabu.cronicle.domain.Run;
 import org.vsbabu.cronicle.service.CronManagerService;
@@ -53,6 +47,10 @@ public class Jobs {
 		cronManager.startRun(job);
 		return "Started";
 	}
+	@RequestMapping(value = "/start", method = RequestMethod.GET)
+	public String jobStartH(@RequestHeader("jobId") String jobId) {
+		return jobStart(jobId);
+	}
 
 	@RequestMapping(value = "/{job}/pass", method = RequestMethod.GET)
 	public String jobSuccess(@PathVariable("job") String jobid) {
@@ -62,6 +60,10 @@ public class Jobs {
 		cronManager.passRun(job);
 		return "Success";
 	}
+	@RequestMapping(value = "/pass", method = RequestMethod.GET)
+	public String jobSuccessH(@RequestHeader("jobId") String jobId) {
+		return jobSuccess(jobId);
+	}
 
 	@RequestMapping(value = "/{job}/fail", method = RequestMethod.GET)
 	public String jobFailed(@PathVariable("job") String jobid) {
@@ -70,6 +72,10 @@ public class Jobs {
 			return "Not found";
 		cronManager.failRun(job);
 		return "Failed";
+	}
+	@RequestMapping(value = "/fail", method = RequestMethod.GET)
+	public String jobFailedH(@RequestHeader("jobId") String jobId) {
+		return jobFailed(jobId);
 	}
 
 	@ExceptionHandler

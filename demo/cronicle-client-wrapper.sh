@@ -9,11 +9,11 @@ JOBID=$1
 shift
 CMD=$1
 shift
-curl $CRONICLE/$JOBID/start
+curl -H "jobId: $JOBID" $CRONICLE/start
 set +e
 $CMD $*
 if  [ $? -eq 0 ]; then
-  curl $CRONICLE/$JOBID/pass
+  curl -H "jobId: $JOBID" $CRONICLE/pass
 else
-  curl $CRONICLE/$JOBID/fail
+  curl -H "jobId: $JOBID" $CRONICLE/fail
 fi

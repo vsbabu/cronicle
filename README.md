@@ -52,6 +52,9 @@ file to be called on this event.
 * Run `cd demo; setup_demo_jobs.sh`
 * Add the output to your crontab
 * After a while, check the UI again - you should see status getting updated
+* Note that  `cronicle-client-wrapper.sh` in `demo` folder is slightly
+  different - it uses *jobId* as a header parameter rather than as path
+  variable. In case you don't want to expose job-ids in request logs.
 
 **Regular Job View**
 
@@ -81,11 +84,9 @@ file to be called on this event.
 
 ## Todo
 
-* Fix the "Yet to Run" marker on the UI - it is overly convoluted
-* relying on guid isn't quite secure unless you've access limited to intranet.
-  At least add basic auth.
-* move schedule future to an api and call it on cron status changed event or created
-* job cleaner only does timeout and not run marking
-* Fix long running logic
-* UI fixes; add/edit/delete; auto refresh; backbone.js
+* [ ] Fix the "Yet to Run" marker on the UI - it is overly convoluted.
+* [X] Security - add guid as a header variable so that it doesn't have to be passed via path.
+* [X] Gradle - mark versions of dependencies so that I don't need to fix this when latest versions of deps are not backward compatible.
+* [ ] Security - add basic auth at least.
+* [ ] Move schedule future to an api and call it on cron status changed event or created
 

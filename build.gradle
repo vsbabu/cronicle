@@ -65,16 +65,17 @@ repositories {
 
 
 dependencies {
-	compile("joda-time:joda-time:2.2")
+  //https://docs.gradle.org/current/userguide/dependency_locking.html is better
+  //to lock down versions outside this file. Ala `pip freeze -r`
 	compile('org.springframework.boot:spring-boot-starter')
   compile("org.springframework.boot:spring-boot-starter-web") 
 	compile("org.springframework.boot:spring-boot-starter-data-rest")
 	compile("org.springframework.boot:spring-boot-starter-data-jpa")
-	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile("joda-time:joda-time:2.2")
+	compile("com.fasterxml.jackson.core:jackson-databind:2.9.5")
 	compile("org.apache.commons:commons-lang3:3.4")
 	compile("io.projectreactor:reactor-bus:2.0.8.RELEASE")
 	compile("io.projectreactor:reactor-core:2.0.8.RELEASE")
-	runtime('com.h2database:h2')
+	runtime('com.h2database:h2:1.4.197')
 	//runtime('org.xerial:sqlite-jdbc:3.7.2')
-	//runtime("org.springframework.boot:spring-boot-starter-jdbc")
 }
