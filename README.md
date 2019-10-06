@@ -56,13 +56,17 @@ file to be called on this event.
 
 ![Regular Job View](docs/screenshot_01_view.png)
 
-**Edit Job**
+**Edit Job** (plus to create new, pencil to edit)
 
 ![Edit the job](docs/screenshot_02_edit.png)
 
-**Get Job Key**
+**Get Job Key** (hamburger menu)
 
 ![Get the job key](docs/screenshot_02_key.png)
+
+**View Runs of a Job** (menu icon at the bottom of the card)
+
+![View job runs](docs/screenshot_03_log.png)
 
 ## Usage
 
