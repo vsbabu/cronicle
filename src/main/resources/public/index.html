@@ -156,7 +156,7 @@
   <div class="row">
     <div class="input-field col s8">
           <input  id="expression" type="text" name="expression" class="validate" required="required"
-          placeholder="quartz compliant; if using regular unix, prepend with a 0"
+          placeholder="quartz compliant; if using regular unix, prepend with a 0 for seconds"
           value="{{expression}}">
           <label for="expression" class="active">Cron Expression</label>
         </div>
@@ -271,8 +271,9 @@ function loadCronList() {
     for (var i=0; i < ctx.crons.length; i++) {
       var c = ctx.crons[i];
       c.ranToday = false;
-      if (c.lastRun.status != null && c.lastRun.startTime > today) {
-        c.ranToday = true;
+      if (c.lastRun != null && c.lastRun.status != null) {
+        var st = moment(c.lastRun.startTime);
+        c.ranToday = (st > today);
       }
     }
     ctx.crons = ctx.crons.sort(function(a,b){

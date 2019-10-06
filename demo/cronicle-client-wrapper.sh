@@ -4,7 +4,7 @@
 # Put your cron command like `thiscommand GUID yourcommand`
 #
 set -e
-CRONICLE="http://localhost/cronicle/job/"
+CRONICLE="http://localhost:8080/job"
 JOBID=$1
 shift
 CMD=$1

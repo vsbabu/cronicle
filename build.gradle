@@ -36,6 +36,9 @@ bootDistZip {
       from './sample-event-handler.sh' 
       from './cronicle-client-wrapper.sh' 
     }
+    into("${project.name}-boot/demo") { 
+      from './demo'
+    }
     into("${project.name}-boot/") { 
       from './README.md' 
       from './bounce.sh' 
@@ -46,6 +49,9 @@ bootDistTar {
       from './config/application.properties' 
       from './sample-event-handler.sh' 
       from './cronicle-client-wrapper.sh' 
+    }
+    into("${project.name}-boot/demo") { 
+      from './demo'
     }
     into("${project.name}-boot/") { 
       from './README.md' 
@@ -69,5 +75,6 @@ dependencies {
 	compile("io.projectreactor:reactor-bus:2.0.8.RELEASE")
 	compile("io.projectreactor:reactor-core:2.0.8.RELEASE")
 	runtime('com.h2database:h2')
+	//runtime('org.xerial:sqlite-jdbc:3.7.2')
 	//runtime("org.springframework.boot:spring-boot-starter-jdbc")
 }

@@ -10,9 +10,13 @@ import org.springframework.stereotype.Component;
 import org.vsbabu.cronicle.domain.Cron;
 import org.vsbabu.cronicle.service.CronManagerService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class JobCleaner {
 
+	private static final Logger logger = LoggerFactory.getLogger(JobCleaner.class);
 	
 	@Autowired private CronManagerService cronManager;
 
@@ -27,16 +31,19 @@ public class JobCleaner {
 	 *
 	 * for now, run every 5 minutes - 300000; TODO: add  to property file
 	 */
-	@Scheduled(fixedRate = 300000)
+	@Scheduled(fixedRateString = "${jobcleaner.frequency}")
 	@Transactional
 	public void scheduleAndCleanup() {
 
 		List<Cron> crons = cronManager.getAllCrons();
+		logger.debug("Job cleaner cron started");
 		for (Cron cron : crons) {
 			cronManager.fixPastPendingRuns(cron);
 			if (null == cronManager.getNextScheduleRun(cron))
-				if (null == cronManager.getCurrentRun(cron))
-					cronManager.scheduleNextRun(cron);					
+				if (null == cronManager.getCurrentRun(cron)) {
+					cronManager.scheduleNextRun(cron);
+					logger.debug(cron.getName() + " :=> scheduled next run");
+				}
 		}
 
 	}

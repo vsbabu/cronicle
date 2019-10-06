@@ -7,9 +7,12 @@ Also, wanted to get muscle memory refreshed on typing in Java code :)
 At just about 1000 sloc (<700 for Java; rest for HTML), it is meeting my needs pretty well. Feel free to 
 fork and use/change it.
 
+For screenshots of the simpleton UI, see below. This is the UI from the demo
+script that setups up jobs for you.
+
 ## Design
 
-![Design](cronicle.png)
+![Design](docs/cronicle.png)
 
 There are two tables viz., `job` and `job_run`. `job` holds the crons and
 `job_run` is a child table that has past runs and *one* future runs record added
@@ -37,10 +40,21 @@ file to be called on this event.
 
 * Build like `gradle buildDistZip`
 * Distribution is in `build/distributions`
-* Take `sample/application.properties` in the distribution to root of your installation and edit it. Default DB is h2; if you want 
-  to change to mysql or postgres, change `build.gradle` to add dependencies and
-  to edit property file with correct connect strings and credentials.
+* Take `sample/application.properties` in the distribution to root of your installation and edit it. Default DB is h2; in `tmp` folder!
+  If you want to change to mysql or postgres, change `build.gradle` to add dependencies and to edit property file with correct connect strings and credentials.
 * Run `bin/cronicle`
+
+## Quick Demo
+* Unzip the distribution somewhere
+* Setup `application.properties` and run `bin/cronicle`
+* Go to http://localhost:8080/ - once you get the UI
+* Run `cd demo; setup_demo_jobs.sh`
+* Add the output to your crontab
+* After a while, check the UI again - you should see status getting updated
+
+![Regular Job View](docs/screenshot_01_view.png)
+![Get the job key](docs/screenshot_02_key.png)
+![Edit the job](docs/screenshot_03_edit.png)
 
 ## Usage
 
@@ -54,9 +68,10 @@ file to be called on this event.
 
 ## Todo
 
-* move schedule future to an api and call it on cron status changed event or created
+* Fix the "Yet to Run" marker on the UI - it is overly convoluted
 * relying on guid isn't quite secure unless you've access limited to intranet.
   At least add basic auth.
+* move schedule future to an api and call it on cron status changed event or created
 * job cleaner only does timeout and not run marking
 * Fix long running logic
 * UI fixes; add/edit/delete; auto refresh; backbone.js

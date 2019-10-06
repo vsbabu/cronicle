@@ -81,18 +81,21 @@ public class CronManagerService {
 					if (!RunFlag.RAN_TOO_LONG.equals(r.getFlag())) {
 						r.setEndTime(current);
 						setRunFlag(cron, r, RunFlag.RAN_TOO_LONG);
+						logger.warn(cron.getName() + " :=> RAN_TOO_LONG");
 					} else {
 						cal.add(Calendar.MINUTE, cron.getMaxRuntime()
 								* (MULTIPLE_TO_WAIT_BEFORE_AUTOFAILED - 1));
 						if (current.after(cal.getTime())) {
 							r.setEndTime(current);
 							moveRunStatusTo(cron, r, RunStatus.FAILED);
+							logger.warn(cron.getName() + " :=> FAILED");
 						}
 					}
 				}
 			}
 			if (RunStatus.SCHEDULED.equals(r.getStatus())) {
 				moveRunStatusTo(cron, r, RunStatus.DID_NOT_RUN);
+				logger.info(cron.getName() + " :=> DID_NOT_RUN");
 			}
 		}
 	}
