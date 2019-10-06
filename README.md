@@ -92,4 +92,6 @@ file to be called on this event.
 * [X] Gradle - mark versions of dependencies so that I don't need to fix this when latest versions of deps are not backward compatible.
 * [ ] Security - add basic auth at least.
 * [ ] Move schedule future to an api and call it on cron status changed event or created
+* [ ] Add another background JVM task to archive or delete older-than-X `job_run` records
+
 
