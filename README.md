@@ -52,9 +52,14 @@ file to be called on this event.
 * Add the output to your crontab
 * After a while, check the UI again - you should see status getting updated
 
+**Regular Job View**
 ![Regular Job View](docs/screenshot_01_view.png)
+
+**Edit Job**
+![Edit the job](docs/screenshot_02_edit.png)
+
+**Get Job Key**
 ![Get the job key](docs/screenshot_02_key.png)
-![Edit the job](docs/screenshot_03_edit.png)
 
 ## Usage
 
