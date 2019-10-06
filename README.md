@@ -6,7 +6,7 @@ Also, wanted to get muscle memory refreshed on typing in Java code :)
 
 ## Design
 
-![Design][cronicle.png]
+![Design](cronicle.png)
 
 There are two tables viz., `job` and `job_run`. `job` holds the crons and
 `job_run` is a child table that has past runs and *one* future runs record added
