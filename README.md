@@ -31,7 +31,7 @@ There is one cron inside the JVM that marks old jobs that didn't get to
 a terminal state, as FAILED or DID_NOT_RUN.
 
 You will need to call APIs to mark your job as started or finished. See
-the script `cronicle_client_wrapper.sh` to just wrap your existing job in your
+the script `cronicle-client-wrapper.sh` to just wrap your existing job in your
 crontab entry with minimal effort.
 
 Finally, when a `job_run` gets into terminal state via API or via cron inside
