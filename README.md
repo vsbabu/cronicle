@@ -1,6 +1,33 @@
 # Cronicle
 
-A simple Spring Boot Java server to keep track of whether your cron jobs ran or not.
+A simple Spring Boot Java server to keep track of whether your cron jobs ran or not. There are many paid
+services that do this, but I found it too expensive for doing such a thing.
+Also, wanted to get muscle memory refreshed on typing in Java code :)
+
+## Design
+
+![Design][cronicle.png]
+
+There are two tables viz., `job` and `job_run`. `job` holds the crons and
+`job_run` is a child table that has past runs and *one* future runs record added
+for each job. State machine for `job_run` is like below.
+
+* UNSCHEDULED -> SCHEDULED
+* SCHEDULED -> RUNNING
+* RUNNING -> SUCCESS 
+* RUNNING -> FAILED
+* SCHEDULED -> DID_NOT_RUN
+  
+There is one cron inside the JVM that marks old jobs that didn't get to
+a terminal state, as FAILED or DID_NOT_RUN.
+
+You will need to call APIs to mark your job as started or finished. See
+the script `cronicle_client_wrapper.sh` to just wrap your existing job in your
+crontab entry with minimal effort.
+
+Finally, when a `job_run` gets into terminal state via API or via cron inside
+the JVM, it raises a reactor event. You can add your own program in property
+file to be called on this event. 
 
 
 ## Installation
@@ -14,13 +41,13 @@ A simple Spring Boot Java server to keep track of whether your cron jobs ran or 
 
 ## Usage
 
-* Add a cron job using the UI
+* Add a cron job using the UI. UI is a quick hack SPA :)
 * Note  the guid of the job
 * Change your cron job to run inside `cronicle-client-wrapper.sh`. See that script for usage.
   * This means, if your crons are in another machine, you need to copy over the wrapper script there
     and ensure that machine can do http connections to where this is running.
 * If you want, you can enable event processing by setting your handler in `application.properties`.
-  * Sample is given in `sample-event-handler.sh`
+  * Sample is given in `sample-event-handler.sh`. Bbe careful to make that program non-blocking.  For example, if you are sending a mail there, you should handle exiting quickly if email server is taking lot of time.
 
 ## Todo
 
