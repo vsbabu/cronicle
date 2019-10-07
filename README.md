@@ -4,22 +4,41 @@
 
 A simple Spring Boot Java server to keep track of whether your cron jobs ran or not. There are many paid
 services that do this, but I found it too expensive for doing such a thing.
-Also, wanted to get muscle memory refreshed on typing in Java code :)
 
 At just about 1000 sloc (<700 for Java; rest for HTML), it is meeting my needs pretty well. Feel free to 
 fork and use/change it.
 
+## Questions Answered by *Cronicle*
+
+* Did my cron job start at all?
+* Did it successfully complete?
+* How much time did it take for a run?
+* When is it supposed to run next?
+* Can I mark an SLA for a cron to run and flag if it took too much time to run?
+* Can I do some central processing when a job didn't run/ran/failed etc?
 
 For more screenshots of the simpleton UI, go to [Quick Demo](#quick-demo) section. This is the UI from the demo
 script that creates sample cron jobs for you and adds to cronicle for a trial run.
+
+## *Cronicle* is not for
+
+* Scheduling your jobs in a central system. I like jobs being set up where they
+  belong, ie., in the systems they are supposed to be. Not this all in one place
+  thing that reaches out and runs in remote machines. This is a central
+  monitoring place for your crons in whatever machines you've as long as those
+  machines can hit a URL in Cronicle.
+* Monitoring 1000s of jobs scheduled in a minute by minute basis. It works for
+  what most people consider as regular jobs.
+* Highly security conscious. In fact, there is no security. Use it wisely
+  within your intranet!
 
 ## Design
 
 ![Design](docs/cronicle.png)
 
-There are two tables viz., `job` and `job_run`. `job` holds the crons and
-`job_run` is a child table that has past runs and *one* future runs record added
-for each job. State machine for `job_run` is like below.
+There are two tables viz., `cron` and `run`. `cron` holds the crons and
+`run` is a child table that has past runs and *one* future runs record added
+for each job. State machine for `run` is like below.
 
 * UNSCHEDULED -> SCHEDULED
 * SCHEDULED -> RUNNING
@@ -34,7 +53,7 @@ You will need to call APIs to mark your job as started or finished. See
 the script `cronicle-client-wrapper.sh` to just wrap your existing job in your
 crontab entry with minimal effort.
 
-Finally, when a `job_run` gets into terminal state via API or via cron inside
+Finally, when a `run` gets into terminal state via API or via cron inside
 the JVM, it raises a reactor event. You can add your own program in property
 file to be called on this event. 
 
@@ -92,6 +111,6 @@ file to be called on this event.
 * [X] Gradle - mark versions of dependencies so that I don't need to fix this when latest versions of deps are not backward compatible.
 * [ ] Security - add basic auth at least.
 * [ ] Move schedule future to an api and call it on cron status changed event or created
-* [ ] Add another background JVM task to archive or delete older-than-X `job_run` records
+* [ ] Add another background JVM task to archive or delete older-than-X `run` records
 
 
